@@ -62,6 +62,9 @@ string window_name = "stache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
 int scaleHeight = 6;
 int offsetHeight = 4;
+int camWidth = 0;
+int camHeight = 0;
+int camFPS = 0;
 
 RNG rng(12345);
 
@@ -78,6 +81,9 @@ int main(int argc, const char** argv) {
   if(argc > 2) stacheMaskFile = argv[2];
   if(argc > 3) scaleHeight = atoi(argv[3]);
   if(argc > 4) offsetHeight = atoi(argv[4]);
+  if(argc > 5) camWidth = atoi(argv[5]);
+  if(argc > 6) camHeight = atoi(argv[6]);
+  if(argc > 7) camFPS = atoi(argv[7]);
 
   //-- 0. Print the copyright
   cout << copyright;
@@ -91,16 +97,20 @@ int main(int argc, const char** argv) {
 
   //-- 2. Read the video stream
   capture = cvCaptureFromCAM(numCamera);
+  if(camWidth) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, camWidth);
+  if(camHeight) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, camHeight);
+  if(camFPS) cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, camFPS);
   if(capture) {
     while(true) {
       frame = cvQueryFrame(capture);
   
       //-- 3. Apply the classifier to the frame
       try {
-       if( !frame.empty() )
-        { detectAndDisplay( frame ); }
-       else
-        { printf(" --(!) No captured frame -- Break!"); break; }
+       if(!frame.empty()) {
+        detectAndDisplay( frame );
+       } else {
+        printf(" --(!) No captured frame -- Break!"); break;
+       }
        
        int c = waitKey(10);
        if( (char)c == 'c' ) { break; } 
