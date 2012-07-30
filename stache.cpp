@@ -50,7 +50,7 @@ loss of use, data, or profits; or business interruption) however caused\n\
 and on any theory of liability, whether in contract, strict liability,\n\
 or tort (including negligence or otherwise) arising in any way out of\n\
 the use of this software, even if advised of the possibility of such damage.\n\
-";
+\n";
 
 /** Function Headers */
 void detectAndDisplay(Mat frame);
@@ -69,6 +69,11 @@ RNG rng(12345);
 int main(int argc, const char** argv) {
   CvCapture* capture;
   Mat frame;
+  int numCamera = -1;
+  const char* stacheMaskFile = "stache-mask.png";
+
+  if(argc > 1) numCamera = atoi(argv[1]);
+  if(argc > 2) stacheMaskFile = argv[2];
 
   //-- 0. Print the copyright
   cout << copyright;
@@ -77,11 +82,11 @@ int main(int argc, const char** argv) {
   if( !face_cascade.load(face_cascade_name) ){ printf("--(!)Error loading\n"); return -1; };
 
   //-- 1a. Load the mustache mask
-  mask = cvLoadImage("stache-mask.png");
-  if(!mask) printf("Could not load stache-mask.png\n");
+  mask = cvLoadImage(stacheMaskFile);
+  if(!mask) { printf("Could not load %s\n", stacheMaskFile); exit(-1); }
 
   //-- 2. Read the video stream
-  capture = cvCaptureFromCAM(-1);
+  capture = cvCaptureFromCAM(numCamera);
   if(capture) {
     while(true) {
       frame = cvQueryFrame(capture);
