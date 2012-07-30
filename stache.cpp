@@ -58,7 +58,7 @@ void detectAndDisplay(Mat frame);
 /** Global variables */
 String face_cascade_name = "lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
-string window_name = "Capture - Face detection";
+string window_name = "stache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
 
 RNG rng(12345);
