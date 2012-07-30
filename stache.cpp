@@ -60,13 +60,15 @@ String face_cascade_name = "lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
 string window_name = "stache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
+
+/** Command-line arguments */
+int numCamera = -1;
+const char* stacheMaskFile = "stache-mask.png";
 int scaleHeight = 6;
 int offsetHeight = 4;
 int camWidth = 0;
 int camHeight = 0;
 int camFPS = 0;
-
-RNG rng(12345);
 
 /**
  * @function main
@@ -74,8 +76,6 @@ RNG rng(12345);
 int main(int argc, const char** argv) {
   CvCapture* capture;
   Mat frame;
-  int numCamera = -1;
-  const char* stacheMaskFile = "stache-mask.png";
 
   if(argc > 1) numCamera = atoi(argv[1]);
   if(argc > 2) stacheMaskFile = argv[2];
