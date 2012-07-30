@@ -60,6 +60,8 @@ String face_cascade_name = "lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
 string window_name = "stache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
+int scaleHeight = 6;
+int offsetHeight = 4;
 
 RNG rng(12345);
 
@@ -74,6 +76,8 @@ int main(int argc, const char** argv) {
 
   if(argc > 1) numCamera = atoi(argv[1]);
   if(argc > 2) stacheMaskFile = argv[2];
+  if(argc > 3) scaleHeight = atoi(argv[3]);
+  if(argc > 4) offsetHeight = atoi(argv[4]);
 
   //-- 0. Print the copyright
   cout << copyright;
@@ -124,10 +128,10 @@ void detectAndDisplay(Mat frame) {
     //-- Scale and apply mustache mask for each face
     Mat faceROI = frame_gray(faces[i]);
     IplImage iplFrame = frame;
-    IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, faces[i].height/6),
+    IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, faces[i].height/scaleHeight),
       mask->depth, mask->nChannels );
-    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y + (faces[i].height/6)*4,
-      faces[i].width, faces[i].height/6));
+    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y + (faces[i].height/scaleHeight)*offsetHeight,
+      faces[i].width, faces[i].height/scaleHeight));
     cvResize(mask, iplMask, CV_INTER_LINEAR);
     cvSub(&iplFrame, iplMask, &iplFrame);
     cvResetImageROI(&iplFrame);
