@@ -148,5 +148,6 @@ void detectAndDisplay(Mat frame) {
   }
 
   //-- Show what you got
+  flip(frame, frame, 1);
   imshow(window_name, frame);
 }
