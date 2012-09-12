@@ -5,6 +5,28 @@ var OAuth = require('oauth').OAuth;
 var child_process = require('child_process');
 var keys = require('./twitterkeys');
 
+function LED() {
+    console.log("LED initialized");
+    var trigger = "/sys/class/leds/lcd3\:\:usr0/trigger";
+    var brightness = "/sys/class/leds/lcd3\:\:usr0/brightness";
+    fs.writeFileSync(trigger, "none");
+    fs.writeFileSync(brightness, "0");
+    this.on = function() {
+        console.log("LED on");
+        fs.writeFileSync(brightness, "1");
+    };
+    this.off = function() {
+        console.log("LED off");
+        fs.writeFileSync(trigger, "none");
+        fs.writeFileSync(brightness, "0");
+    };
+    this.blink = function() {
+        console.log("LED blink");
+        fs.writeFileSync(trigger, "timer");
+    };
+};
+var led = new LED();
+
 function sendTweet(tweet, photoName) {
     var hostname = 'upload.twitter.com';
     var path = '/1/statuses/update_with_media.json';
@@ -88,10 +110,12 @@ function sendTweet(tweet, photoName) {
     };
     function onRequestErr(err) {
         console.log('Error: Something is wrong.\n'+err+JSON.stringify(err)+'\n');
+        led.blink();
     };
     function onRequestResponse(response) {            
         function printStatusCode() {
             console.log(response.statusCode +'\n');
+            led.off();
         };
         response.setEncoding('utf8');            
         response.on('data', printChunk);
@@ -110,7 +134,8 @@ function stacheMessage(data) {
         data = JSON.parse(data);
         if(data.tweet && data.filename) {
             console.log('stacheMessage = ' + JSON.stringify(data));
-            //sendTweet(data.tweet, data.filename);
+            led.on();
+            sendTweet(data.tweet, data.filename);
         }
     } catch(ex) {
     }
