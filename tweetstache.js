@@ -37,7 +37,7 @@ function sendTweet(tweet, photoName) {
     //var pport = 80;
     //var proxy = 'http://' + phostname;
 
-    var data = fs.readFileSync('./' + photoName);
+    var data = fs.readFileSync(photoName);
 
     var oauth = new OAuth(
         'https://api.twitter.com/oauth/request_token',
