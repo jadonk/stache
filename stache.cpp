@@ -8,11 +8,13 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace cv;
 
-string copyright = "\
+const char copyright[] = "\
  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING. \n\
  \n\
  By downloading, copying, installing or using the software you agree to this license.\n\
@@ -54,6 +56,9 @@ the use of this software, even if advised of the possibility of such damage.\n\
 
 /** Function Headers */
 void detectAndDisplay(Mat frame);
+void saveFrame(Mat frame);
+int inputAvailable();
+void inputSetup(int setup);
 
 /** Global variables */
 String face_cascade_name = "lbpcascade_frontalface.xml";
@@ -69,6 +74,8 @@ int offsetHeight = 4;
 int camWidth = 0;
 int camHeight = 0;
 float camFPS = 0;
+
+int savedFrames = 0;
 
 /**
  * @function main
@@ -86,14 +93,14 @@ int main(int argc, const char** argv) {
   if(argc > 7) camFPS = (float)atof(argv[7]);
 
   //-- 0. Print the copyright
-  cout << copyright;
+  fprintf(stderr, "%s", copyright);
 
   //-- 1. Load the cascade
-  if( !face_cascade.load(face_cascade_name) ){ printf("--(!)Error loading\n"); return -1; };
+  if( !face_cascade.load(face_cascade_name) ){ fprintf(stderr, "--(!)Error loading\n"); return -1; };
 
   //-- 1a. Load the mustache mask
   mask = cvLoadImage(stacheMaskFile);
-  if(!mask) { printf("Could not load %s\n", stacheMaskFile); exit(-1); }
+  if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-1); }
 
   //-- 2. Read the video stream
   capture = cvCaptureFromCAM(numCamera);
@@ -101,6 +108,7 @@ int main(int argc, const char** argv) {
   if(camHeight) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, camHeight);
   if(camFPS) cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, camFPS);
   if(capture) {
+    inputSetup(1);
     while(true) {
       frame = cvQueryFrame(capture);
   
@@ -109,14 +117,17 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
        } else {
-        printf(" --(!) No captured frame -- Break!"); break;
+        fprintf(stderr, " --(!) No captured frame -- Break!"); break;
        }
        
-       int c = waitKey(10);
-       if( (char)c == 'c' ) { break; } 
+       if(int c = inputAvailable()) {
+        if( (char)c == 'c' ) { break; } 
+        else if( (char)c == 's' ) { saveFrame(frame); }
+       }
       } catch(cv::Exception e) {
       }
     }
+    inputSetup(0);
   }
   return 0;
 }
@@ -127,6 +138,7 @@ int main(int argc, const char** argv) {
 void detectAndDisplay(Mat frame) {
   std::vector<Rect> faces;
   Mat frame_gray;
+  int i = 0;
 
   cvtColor(frame, frame_gray, CV_BGR2GRAY);
   equalizeHist(frame_gray, frame_gray);
@@ -134,7 +146,7 @@ void detectAndDisplay(Mat frame) {
   //-- Detect faces
   face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0, Size(80, 80));
 
-  for(int i = 0; i < faces.size(); i++) {
+  for(; i < faces.size(); i++) {
     //-- Scale and apply mustache mask for each face
     Mat faceROI = frame_gray(faces[i]);
     IplImage iplFrame = frame;
@@ -150,4 +162,47 @@ void detectAndDisplay(Mat frame) {
   //-- Show what you got
   flip(frame, frame, 1);
   imshow(window_name, frame);
+}
+
+
+void saveFrame(Mat frame) {
+  char filename[20];
+  IplImage iplFrame = frame;
+  sprintf(filename, "captured%03d.jpg", savedFrames);
+  cvSaveImage(filename, &iplFrame);
+  fprintf(stdout, "{\"tweet\":\"New BeagleStache captured!\",\"filename\":\"%s\"}\n", filename);
+  fflush(stdout);
+  savedFrames++;
+  if(savedFrames >= 1000) savedFrames = 0;
+}
+
+int inputAvailable()  
+{
+  struct timeval tv;
+  int c;
+  fd_set fds;
+  tv.tv_sec = 0;
+  tv.tv_usec = 0;
+  FD_ZERO(&fds);
+  FD_SET(STDIN_FILENO, &fds);
+  select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+  if(FD_ISSET(0, &fds)) {
+   c = getchar();
+   return c;
+  } else {
+   return 0;
+  }
+}
+
+void inputSetup(int setup)  
+{
+  static struct termios oldt, newt;
+  if(setup) {
+   tcgetattr(STDIN_FILENO, &oldt);
+   newt = oldt;
+   newt.c_lflag &= ~(ICANON);
+   tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+  } else {
+   tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+  }
 }
