@@ -68,7 +68,7 @@ int scaleHeight = 6;
 int offsetHeight = 4;
 int camWidth = 0;
 int camHeight = 0;
-int camFPS = 0;
+float camFPS = 0;
 
 /**
  * @function main
@@ -83,7 +83,7 @@ int main(int argc, const char** argv) {
   if(argc > 4) offsetHeight = atoi(argv[4]);
   if(argc > 5) camWidth = atoi(argv[5]);
   if(argc > 6) camHeight = atoi(argv[6]);
-  if(argc > 7) camFPS = atoi(argv[7]);
+  if(argc > 7) camFPS = (float)atof(argv[7]);
 
   //-- 0. Print the copyright
   cout << copyright;
