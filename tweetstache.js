@@ -83,18 +83,22 @@ var options = {
 
 console.log('options = ' + JSON.stringify(options));
 
-var request = typeof(proxy) !== 'undefined' ? http.request(options) : https.request(options);     
-request.on('error', function (err) {
+function printChunk(chunk) {
+    console.log(chunk.toString());
+};
+function onRequestErr(err) {
     console.log('Error: Something is wrong.\n'+err+JSON.stringify(err)+'\n');
-});
-request.on('response', function (response) {            
-    response.setEncoding('utf8');            
-    response.on('data', function (chunk) {
-        console.log(chunk.toString());
-    });
-    response.on('end', function () {
+};
+function onRequestResponse(response) {            
+    function printStatusCode() {
         console.log(response.statusCode +'\n');
-    });
-});  
+    };
+    response.setEncoding('utf8');            
+    response.on('data', printChunk);
+    response.on('end', printStatusCode);
+};
+var request = typeof(proxy) !== 'undefined' ? http.request(options) : https.request(options);     
+request.on('error', onRequestErr);
+request.on('response', onRequestResponse);
 request.write(multipartBody);
 request.end();
