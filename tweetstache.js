@@ -1,12 +1,11 @@
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
-var oauth = require('oauth');
+var OAuth = require('oauth').OAuth;
 var child_process = require('child_process');
 var keys = require('./twitterkeys');
 
 function sendTweet(tweet, photoName) {
-    var OAuth = oauth.OAuth;
     var hostname = 'upload.twitter.com';
     var path = '/1/statuses/update_with_media.json';
     var port = 443;
@@ -37,7 +36,7 @@ function sendTweet(tweet, photoName) {
         + tweet + crlf
         + separator + crlf
         + fileHeader + crlf
-        + 'Content-Type: image/png' +  crlf
+        + 'Content-Type: image/jpeg' +  crlf
         + crlf);
 
     var multipartBodyLength = contents.length + data.length + footer.length;
@@ -105,6 +104,6 @@ function sendTweet(tweet, photoName) {
     request.end();
 };
 
-var photoName = 'beaglestache.png';
+var photoName = 'captured000.jpg';
 var tweet = 'Test tweet from tweetstache.js';
 sendTweet(tweet, photoName);
