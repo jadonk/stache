@@ -104,6 +104,25 @@ function sendTweet(tweet, photoName) {
     request.end();
 };
 
-var photoName = 'captured000.jpg';
-var tweet = 'Test tweet from tweetstache.js';
-sendTweet(tweet, photoName);
+function stacheMessage(data) {
+    //console.log('stacheMessage = ' + data);
+    try {
+        data = JSON.parse(data);
+        if(data.tweet && data.filename) {
+            console.log('stacheMessage = ' + JSON.stringify(data));
+            //sendTweet(data.tweet, data.filename);
+        }
+    } catch(ex) {
+    }
+};
+var stache = child_process.spawn('./stache', [], {stdio:['pipe', 'pipe', process.stderr]});
+stache.stdout.setEncoding('ascii');
+stache.stdout.on('data', stacheMessage);
+
+function requestStache() {
+    console.log('requestStache');
+    stache.stdin.write('s');
+};
+
+setInterval(requestStache, 5000);
+

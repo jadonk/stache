@@ -14,7 +14,7 @@
 using namespace std;
 using namespace cv;
 
-string copyright = "\
+const char copyright[] = "\
  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING. \n\
  \n\
  By downloading, copying, installing or using the software you agree to this license.\n\
@@ -93,14 +93,14 @@ int main(int argc, const char** argv) {
   if(argc > 7) camFPS = atoi(argv[7]);
 
   //-- 0. Print the copyright
-  cout << copyright;
+  fprintf(stderr, "%s", copyright);
 
   //-- 1. Load the cascade
-  if( !face_cascade.load(face_cascade_name) ){ printf("--(!)Error loading\n"); return -1; };
+  if( !face_cascade.load(face_cascade_name) ){ fprintf(stderr, "--(!)Error loading\n"); return -1; };
 
   //-- 1a. Load the mustache mask
   mask = cvLoadImage(stacheMaskFile);
-  if(!mask) { printf("Could not load %s\n", stacheMaskFile); exit(-1); }
+  if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-1); }
 
   //-- 2. Read the video stream
   capture = cvCaptureFromCAM(numCamera);
@@ -117,7 +117,7 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
        } else {
-        printf(" --(!) No captured frame -- Break!"); break;
+        fprintf(stderr, " --(!) No captured frame -- Break!"); break;
        }
        
        if(int c = inputAvailable()) {
@@ -170,8 +170,10 @@ void saveFrame(Mat frame) {
   IplImage iplFrame = frame;
   sprintf(filename, "captured%03d.jpg", savedFrames);
   cvSaveImage(filename, &iplFrame);
-  printf("Saved %s\n", filename);
+  fprintf(stdout, "{\"tweet\":\"New BeagleStache captured!\",\"filename\":\"%s\"}\n", filename);
+  fflush(stdout);
   savedFrames++;
+  if(savedFrames >= 1000) savedFrames = 0;
 }
 
 int inputAvailable()  
