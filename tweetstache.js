@@ -115,7 +115,10 @@ function stacheMessage(data) {
     } catch(ex) {
     }
 };
-var stache = child_process.spawn('./stache', [], {stdio:['pipe', 'pipe', process.stderr]});
+var stache = child_process.spawn('./stache', 
+ ['-1','stache-mask.png','6','4','0','640','480','0.5'], 
+ {stdio:['pipe', 'pipe', process.stderr]}
+);
 stache.stdout.setEncoding('ascii');
 stache.stdout.on('data', stacheMessage);
 

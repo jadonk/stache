@@ -1,3 +1,3 @@
 #!/bin/sh
 cd $HOME/stache
-./stache -1 stache-mask.png 6 4 0 640 480 0.5
+node tweetstache.js
