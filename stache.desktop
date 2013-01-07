@@ -3,5 +3,6 @@ Version=1.0
 Name=BeagleStache
 Comment=Superimposes mustache using OpenCV
 Exec=/home/root/stache/runstache
-Terminal=true
+Icon=/home/root/stache/beaglestache.png
+Terminal=false
 Type=Application

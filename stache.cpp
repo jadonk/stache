@@ -96,7 +96,7 @@ int main(int argc, const char** argv) {
   fprintf(stderr, "%s", copyright);
 
   //-- 1. Load the cascade
-  if( !face_cascade.load(face_cascade_name) ){ fprintf(stderr, "--(!)Error loading\n"); return -1; };
+  if( !face_cascade.load(face_cascade_name) ){ fprintf(stderr, "--(!)Error loading\n"); exit(-1); };
 
   //-- 1a. Load the mustache mask
   mask = cvLoadImage(stacheMaskFile);
@@ -117,18 +117,19 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
        } else {
-        fprintf(stderr, " --(!) No captured frame -- Break!\n"); break;
+        fprintf(stderr, " --(!) No captured frame -- Break!\n"); exit(-2);
        }
 
        int c = waitKey(10);
-       if( c == (int)'c' ) { break; } 
-       else if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
+       if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
       } catch(cv::Exception e) {
       }
     }
     inputSetup(0);
+  } else {
+    exit(-3);
   }
-  return 0;
+  exit(0);
 }
 
 /**
