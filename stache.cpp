@@ -167,6 +167,7 @@ void detectAndDisplay(Mat frame) {
 
 void saveFrame(Mat frame) {
   char filename[20];
+  flip(frame, frame, 1); // de-mirror-image-ize
   IplImage iplFrame = frame;
   sprintf(filename, "/tmp/captured%03d.jpg", savedFrames);
   cvSaveImage(filename, &iplFrame);

@@ -118,7 +118,8 @@ function sendTweet(tweet, photoName) {
     function onRequestResponse(response) {            
         function printStatusCode() {
             winston.info(response.statusCode +'\n');
-            led.off();
+            if(response.statusCode == 200) led.off();
+            else led.blink();
         };
         response.setEncoding('utf8');            
         response.on('data', printChunk);
