@@ -168,7 +168,7 @@ void detectAndDisplay(Mat frame) {
 void saveFrame(Mat frame) {
   char filename[20];
   IplImage iplFrame = frame;
-  sprintf(filename, "captured%03d.jpg", savedFrames);
+  sprintf(filename, "/tmp/captured%03d.jpg", savedFrames);
   cvSaveImage(filename, &iplFrame);
   fprintf(stdout, "{\"tweet\":\"New BeagleStache captured!\",\"filename\":\"%s\"}\n", filename);
   fflush(stdout);
