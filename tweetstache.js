@@ -127,5 +127,5 @@ function requestStache() {
     stache.stdin.write('s');
 };
 
-setInterval(requestStache, 5000);
+//setInterval(requestStache, 5000);
 

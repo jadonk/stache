@@ -117,13 +117,12 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
        } else {
-        fprintf(stderr, " --(!) No captured frame -- Break!"); break;
+        fprintf(stderr, " --(!) No captured frame -- Break!\n"); break;
        }
-       
-       if(int c = inputAvailable()) {
-        if( (char)c == 'c' ) { break; } 
-        else if( (char)c == 's' ) { saveFrame(frame); }
-       }
+
+       int c = waitKey(10);
+       if( c == (int)'c' ) { break; } 
+       else if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
       } catch(cv::Exception e) {
       }
     }
