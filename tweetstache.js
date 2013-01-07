@@ -1,27 +1,30 @@
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
+var winston = require('winston');
 var OAuth = require('oauth').OAuth;
 var child_process = require('child_process');
 var keys = require('./twitterkeys');
 
+winston.add(winston.transports.File, { filename: '/var/log/beaglestache.log' });
+
 function LED() {
-    console.log("LED initialized");
+    winston.info("LED initialized");
     var trigger = "/sys/class/leds/lcd3\:\:usr0/trigger";
     var brightness = "/sys/class/leds/lcd3\:\:usr0/brightness";
     fs.writeFileSync(trigger, "none");
     fs.writeFileSync(brightness, "0");
     this.on = function() {
-        console.log("LED on");
+        winston.info("LED on");
         fs.writeFileSync(brightness, "1");
     };
     this.off = function() {
-        console.log("LED off");
+        winston.info("LED off");
         fs.writeFileSync(trigger, "none");
         fs.writeFileSync(brightness, "0");
     };
     this.blink = function() {
-        console.log("LED blink");
+        winston.info("LED blink");
         fs.writeFileSync(trigger, "timer");
     };
 };
@@ -63,22 +66,22 @@ function sendTweet(tweet, photoName) {
 
     var multipartBodyLength = contents.length + data.length + footer.length;
     var multipartBody = new Buffer(multipartBodyLength);
-    console.log('contents.length = ' + contents.length);
-    console.log('' + contents);
-    console.log('data.length = ' + data.length);
-    console.log('footer.length = ' + footer.length);
-    console.log('' + footer);
-    console.log('multipartBody.length = ' + multipartBody.length);
+    winston.info('contents.length = ' + contents.length);
+    winston.info('' + contents);
+    winston.info('data.length = ' + data.length);
+    winston.info('footer.length = ' + footer.length);
+    winston.info('' + footer);
+    winston.info('multipartBody.length = ' + multipartBody.length);
     var index = 0;
-    console.log('index = ' + index);
+    winston.info('index = ' + index);
     for(var i = 0; i < contents.length; i++, index++) {
         multipartBody[index] = contents[i];
     }
-    console.log('index = ' + index);
+    winston.info('index = ' + index);
     for(var i = 0; i < data.length; i++, index++) {
         multipartBody[index] = data[i];
     }
-    console.log('index = ' + index);
+    winston.info('index = ' + index);
     for(var i = 0; i < footer.length; i++, index++) {
         multipartBody[index] = footer[i];
     }
@@ -103,18 +106,18 @@ function sendTweet(tweet, photoName) {
         headers: headers
     };
 
-    console.log('options = ' + JSON.stringify(options));
+    winston.info('options = ' + JSON.stringify(options));
 
     function printChunk(chunk) {
-        console.log(chunk.toString());
+        winston.info(chunk.toString());
     };
     function onRequestErr(err) {
-        console.log('Error: Something is wrong.\n'+err+JSON.stringify(err)+'\n');
+        winston.info('Error: Something is wrong.\n'+err+JSON.stringify(err)+'\n');
         led.blink();
     };
     function onRequestResponse(response) {            
         function printStatusCode() {
-            console.log(response.statusCode +'\n');
+            winston.info(response.statusCode +'\n');
             led.off();
         };
         response.setEncoding('utf8');            
@@ -129,11 +132,11 @@ function sendTweet(tweet, photoName) {
 };
 
 function stacheMessage(data) {
-    //console.log('stacheMessage = ' + data);
+    winston.log('debug', 'stacheMessage = ' + data);
     try {
         data = JSON.parse(data);
         if(data.tweet && data.filename) {
-            console.log('stacheMessage = ' + JSON.stringify(data));
+            winston.info('stacheMessage = ' + JSON.stringify(data));
             led.on();
             sendTweet(data.tweet, data.filename);
         }
@@ -141,7 +144,7 @@ function stacheMessage(data) {
     }
 };
 var stacheExit = function(code, signal) {
-    console.log('stache exited: ' + code + ' signal: ' + signal);
+    winston.info('stache exited: ' + code + ' signal: ' + signal);
 };
 var stache = child_process.spawn('./stache', 
  ['-1','stache-mask.png','6','4','0','640','480','0.5'], 
@@ -152,7 +155,7 @@ stache.stdout.on('data', stacheMessage);
 stache.on('exit', stacheExit);
 
 function requestStache() {
-    console.log('requestStache');
+    winston.info('requestStache');
     stache.stdin.write('s');
 };
 
