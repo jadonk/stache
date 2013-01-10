@@ -134,12 +134,10 @@ function sendTweet(tweet, photoName) {
             if(response.statusCode == 200) led.off();
             else {
                 led.blink();
-                if(response.statusCode == 401) {
-                    var resendTweet = function() {
-                        sendTweet(tweet, photoName);
-                    }
-                    setTimeout(resendTweet, 60000);
+                var resendTweet = function() {
+                    sendTweet(tweet, photoName);
                 }
+                setTimeout(resendTweet, 60000);
             }
         };
         response.setEncoding('utf8');            
@@ -160,7 +158,7 @@ function stacheMessage(data) {
         if(data.tweet && data.filename) {
             winston.info('stacheMessage = ' + JSON.stringify(data));
             led.on();
-            sendTweet("New #BeagleBone BeagleStache image captured at #2013CES #CESInnovate @BeagleBoardOrg", data.filename);
+            sendTweet("New #BeagleBone BeagleStache image captured at Embedded Linux Conference 2013 #lfelc! @BeagleBoardOrg", data.filename);
         }
     } catch(ex) {
     }
