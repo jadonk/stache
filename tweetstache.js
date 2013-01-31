@@ -4,14 +4,23 @@ var fs = require('fs');
 var winston = require('winston');
 var OAuth = require('oauth').OAuth;
 var child_process = require('child_process');
-var keys = require('./twitterkeys');
+var config = {};
 
 winston.add(winston.transports.File, { filename: '/var/log/beaglestache.log' });
 
+try {
+    config = require('./config');
+} catch(ex) {
+    winston.info("Not tweeting, no keys found: " + ex);
+    config.trigger = "/sys/class/leds/lcd3\:\:usr0/trigger";
+    config.brightness = "/sys/class/leds/lcd3\:\:usr0/brightness";
+    config.twitterKey = false;
+}
+
 function LED() {
     winston.info("LED initialized");
-    var trigger = "/sys/class/leds/lcd3\:\:usr0/trigger";
-    var brightness = "/sys/class/leds/lcd3\:\:usr0/brightness";
+    var trigger = config.trigger;
+    var brightness = config.brightness;
     fs.writeFileSync(trigger, "none");
     fs.writeFileSync(brightness, "0");
     this.on = function() {
@@ -31,6 +40,10 @@ function LED() {
 var led = new LED();
 
 function sendTweet(tweet, photoName) {
+    if(!config.twitterKey) {
+        led.blink();
+        return;
+    }
     var hostname = 'upload.twitter.com';
     var path = '/1/statuses/update_with_media.json';
     var port = 443;
@@ -45,7 +58,7 @@ function sendTweet(tweet, photoName) {
     var oauth = new OAuth(
         'https://api.twitter.com/oauth/request_token',
         'https://api.twitter.com/oauth/access_token',
-        keys.twitterKey, keys.twitterSecret,
+        config.twitterKey, config.twitterSecret,
         '1.0', null, 'HMAC-SHA1');
 
     var crlf = "\r\n";
@@ -88,7 +101,7 @@ function sendTweet(tweet, photoName) {
 
     var authorization = oauth.authHeader(
         'https://' + hostname + path,
-        keys.accessToken, keys.tokenSecret, 'POST');
+        config.accessToken, config.tokenSecret, 'POST');
 
     var headers = {
         'Authorization': authorization,
