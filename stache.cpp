@@ -63,7 +63,7 @@ void inputSetup(int setup);
 /** Global variables */
 String face_cascade_name = "lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
-string window_name = "stache - BeagleBone OpenCV demo";
+const char * window_name = "stache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
 
 /** Command-line arguments */
@@ -162,6 +162,9 @@ void detectAndDisplay(Mat frame) {
   //-- Show what you got
   flip(frame, frame, 1);
   imshow(window_name, frame);
+
+  //-- 0a. Attempt to resize window
+  cvResizeWindow(window_name, camWidth, camHeight);
 }
 
 

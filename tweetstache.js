@@ -168,7 +168,7 @@ var stacheExit = function(code, signal) {
     winston.info('stache exited: ' + code + ' signal: ' + signal);
 };
 var stache = child_process.spawn('./stache', 
- ['-1','stache-mask.png','6','4','0','640','480','0.5'], 
+ ['-1','stache-mask.png','6','4','0','800','480','0.5'], 
  {stdio:['pipe', 'pipe', process.stderr]}
 );
 stache.stdout.setEncoding('ascii');
