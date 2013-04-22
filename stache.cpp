@@ -149,7 +149,7 @@ void detectAndDisplay(Mat frame) {
     IplImage iplFrame = frame;
     IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, faces[i].height),
       mask->depth, mask->nChannels );
-    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y + faces[i].height,
+    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y,
       faces[i].width, faces[i].height));
     cvResize(mask, iplMask, CV_INTER_LINEAR);
     cvSub(&iplFrame, iplMask, &iplFrame);
