@@ -117,12 +117,11 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
        } else {
-        fprintf(stderr, " --(!) No captured frame -- Break!\n"); exit(-2);
+        fprintf(stderr, " --(!) No captured frame -- Break!\n");
+        break;
        }
-
-       int c = waitKey(10);
-       if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
       } catch(cv::Exception e) {
+        break;
       }
     }
     inputSetup(0);
@@ -157,6 +156,11 @@ void detectAndDisplay(Mat frame) {
     cvResize(mask, iplMask, CV_INTER_LINEAR);
     cvSub(&iplFrame, iplMask, &iplFrame);
     cvResetImageROI(&iplFrame);
+  }
+
+  if(i>0) {
+    int c = waitKey(10);
+    if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
   }
 
   //-- Show what you got
