@@ -167,8 +167,8 @@ function stacheMessage(data) {
 var stacheExit = function(code, signal) {
     winston.info('stache exited: ' + code + ' signal: ' + signal);
 };
-var stache = child_process.spawn('sh', 
- ['-c', './stache', '*.png'], 
+var stache = child_process.spawn('./stache', 
+ ['stache-mask.png', 'stache-2.png', 'stache-robclark.png'], 
  {stdio:['pipe', 'pipe', process.stderr]}
 );
 stache.stdout.setEncoding('ascii');
