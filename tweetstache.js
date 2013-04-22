@@ -15,6 +15,7 @@ try {
     config.trigger = "/sys/class/leds/lcd3\:\:usr0/trigger";
     config.brightness = "/sys/class/leds/lcd3\:\:usr0/brightness";
     config.twitterKey = false;
+    config.message = "New #BeagleBone BeagleStache image captured! @BeagleBoardOrg";
 }
 
 function LED() {
@@ -132,7 +133,13 @@ function sendTweet(tweet, photoName) {
         function printStatusCode() {
             winston.info(response.statusCode +'\n');
             if(response.statusCode == 200) led.off();
-            else led.blink();
+            else {
+                led.blink();
+                var resendTweet = function() {
+                    sendTweet(tweet, photoName);
+                }
+                setTimeout(resendTweet, 60000);
+            }
         };
         response.setEncoding('utf8');            
         response.on('data', printChunk);
@@ -152,7 +159,7 @@ function stacheMessage(data) {
         if(data.tweet && data.filename) {
             winston.info('stacheMessage = ' + JSON.stringify(data));
             led.on();
-            sendTweet(data.tweet, data.filename);
+            sendTweet(config.message, data.filename);
         }
     } catch(ex) {
     }
@@ -171,6 +178,15 @@ stache.on('exit', stacheExit);
 function requestStache() {
     winston.info('requestStache');
     stache.stdin.write('s');
+};
+
+// turn on the display every 30 seconds
+setInterval(unblankDisplay, 30000);
+function unblankDisplay() {
+    try {
+        fs.writeFileSync("/sys/class/graphics/fb0/blank", "0");
+    } catch(ex) {
+    }
 };
 
 //setInterval(requestStache, 5000);

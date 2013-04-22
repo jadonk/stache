@@ -64,7 +64,7 @@ void changeStache(int argc, const char** argv);
 /** Global variables */
 String face_cascade_name = "lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
-string window_name = "stache - BeagleBone OpenCV demo";
+const char * window_name = "stache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
 
 /** Command-line arguments */
@@ -164,6 +164,9 @@ void detectAndDisplay(Mat frame) {
   //-- Show what you got
   flip(frame, frame, 1);
   imshow(window_name, frame);
+
+  //-- 0a. Attempt to resize window
+  cvResizeWindow(window_name, camWidth, camHeight);
 }
 
 void changeStache(int argc, const char** argv) {
@@ -179,10 +182,10 @@ void changeStache(int argc, const char** argv) {
 }
 
 void saveFrame(Mat frame) {
-  char filename[20];
+  char filename[40];
   flip(frame, frame, 1); // de-mirror-image-ize
   IplImage iplFrame = frame;
-  sprintf(filename, "/tmp/captured%03d.jpg", savedFrames);
+  sprintf(filename, "/home/root/stache/tmp/captured%03d.jpg", savedFrames);
   cvSaveImage(filename, &iplFrame);
   fprintf(stdout, "{\"tweet\":\"New BeagleStache captured!\",\"filename\":\"%s\"}\n", filename);
   fflush(stdout);
