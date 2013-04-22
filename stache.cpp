@@ -112,7 +112,7 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
         c = waitKey(10);
-        if( c == 65362 ) { changeStache(argc, argv); }  //-- change stache on press of up arrow
+        if( c == 65363 ) { changeStache(argc, argv); }  //-- change stache on press of right arrow
        } else {
         fprintf(stderr, " --(!) No captured frame -- Break!\n");
         break;
