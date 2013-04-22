@@ -6,7 +6,7 @@ var OAuth = require('oauth').OAuth;
 var child_process = require('child_process');
 var config = {};
 
-//winston.add(winston.transports.File, { filename: '/var/log/beaglestache.log' });
+winston.add(winston.transports.File, { filename: '/var/log/beaglestache.log' });
 
 try {
     config = require('./config');
