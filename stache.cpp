@@ -170,7 +170,7 @@ void detectAndDisplay(Mat frame) {
 }
 
 void changeStache(int argc, const char** argv) {
-  if(argc > currentStache) {
+  if(argc > currentStache + 1) {
     currentStache++;
     stacheMaskFile = argv[currentStache];
   } else {
@@ -178,8 +178,8 @@ void changeStache(int argc, const char** argv) {
     if(argc > 1) stacheMaskFile = argv[1];
   }
   mask = cvLoadImage(stacheMaskFile);
-  if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-2); }
   fprintf(stdout, "{\"new_stache\":\"%s\"}\n", stacheMaskFile);
+  if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-2); }
 }
 
 void saveFrame(Mat frame) {
