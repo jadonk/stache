@@ -179,6 +179,7 @@ void changeStache(int argc, const char** argv) {
   }
   mask = cvLoadImage(stacheMaskFile);
   if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-2); }
+  fprintf(stdout, "{\"new_stache\":\"%s\"}\n", stacheMaskFile);
 }
 
 void saveFrame(Mat frame) {
