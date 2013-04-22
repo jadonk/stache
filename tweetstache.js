@@ -6,7 +6,7 @@ var OAuth = require('oauth').OAuth;
 var child_process = require('child_process');
 var config = {};
 
-winston.add(winston.transports.File, { filename: '/var/log/beaglestache.log' });
+//winston.add(winston.transports.File, { filename: '/var/log/beaglestache.log' });
 
 try {
     config = require('./config');
@@ -160,8 +160,8 @@ function stacheMessage(data) {
 var stacheExit = function(code, signal) {
     winston.info('stache exited: ' + code + ' signal: ' + signal);
 };
-var stache = child_process.spawn('./stache', 
- ['-1','stache-mask.png','6','4','0','640','480','0.5'], 
+var stache = child_process.spawn('sh', 
+ ['-c', './stache', '*.png'], 
  {stdio:['pipe', 'pipe', process.stderr]}
 );
 stache.stdout.setEncoding('ascii');

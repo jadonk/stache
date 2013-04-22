@@ -26,7 +26,7 @@ const char copyright[] = "\
 \n\
 Copyright (C) 2000-2008, Intel Corporation, all rights reserved.\n\
 Copyright (C) 2008-2011, Willow Garage Inc., all rights reserved.\n\
-Copyright (C) 2012, Texas Instruments, all rights reserved.\n\
+Copyright (C) 2012-2013, Texas Instruments, all rights reserved.\n\
 Third party copyrights are property of their respective owners.\n\
 \n\
 Redistribution and use in source and binary forms, with or without modification,\n\
@@ -59,6 +59,7 @@ void detectAndDisplay(Mat frame);
 void saveFrame(Mat frame);
 int inputAvailable();
 void inputSetup(int setup);
+void changeStache(int argc, const char** argv);
 
 /** Global variables */
 String face_cascade_name = "lbpcascade_frontalface.xml";
@@ -69,11 +70,10 @@ IplImage* mask = 0;
 /** Command-line arguments */
 int numCamera = -1;
 const char* stacheMaskFile = "stache-mask.png";
-int scaleHeight = 6;
-int offsetHeight = 4;
 int camWidth = 0;
 int camHeight = 0;
 float camFPS = 0;
+int currentStache = 1;
 
 int savedFrames = 0;
 
@@ -83,14 +83,9 @@ int savedFrames = 0;
 int main(int argc, const char** argv) {
   CvCapture* capture;
   Mat frame;
+  int c;
 
-  if(argc > 1) numCamera = atoi(argv[1]);
-  if(argc > 2) stacheMaskFile = argv[2];
-  if(argc > 3) scaleHeight = atoi(argv[3]);
-  if(argc > 4) offsetHeight = atoi(argv[4]);
-  if(argc > 5) camWidth = atoi(argv[5]);
-  if(argc > 6) camHeight = atoi(argv[6]);
-  if(argc > 7) camFPS = (float)atof(argv[7]);
+  if(argc > 1) stacheMaskFile = argv[1];
 
   //-- 0. Print the copyright
   fprintf(stderr, "%s", copyright);
@@ -104,9 +99,9 @@ int main(int argc, const char** argv) {
 
   //-- 2. Read the video stream
   capture = cvCaptureFromCAM(numCamera);
-  if(camWidth) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, camWidth);
-  if(camHeight) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, camHeight);
-  if(camFPS) cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, camFPS);
+  //if(camWidth) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, camWidth);
+  //if(camHeight) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, camHeight);
+  //if(camFPS) cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, camFPS);
   if(capture) {
     inputSetup(1);
     while(true) {
@@ -116,6 +111,8 @@ int main(int argc, const char** argv) {
       try {
        if(!frame.empty()) {
         detectAndDisplay( frame );
+        c = waitKey(10);
+        if( c == 65362 ) { changeStache(argc, argv); }  //-- change stache on press of up arrow
        } else {
         fprintf(stderr, " --(!) No captured frame -- Break!\n");
         break;
@@ -138,6 +135,7 @@ void detectAndDisplay(Mat frame) {
   std::vector<Rect> faces;
   Mat frame_gray;
   int i = 0;
+  int c;
 
   cvtColor(frame, frame_gray, CV_BGR2GRAY);
   equalizeHist(frame_gray, frame_gray);
@@ -149,17 +147,17 @@ void detectAndDisplay(Mat frame) {
     //-- Scale and apply mustache mask for each face
     Mat faceROI = frame_gray(faces[i]);
     IplImage iplFrame = frame;
-    IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, faces[i].height/scaleHeight),
+    IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, faces[i].height),
       mask->depth, mask->nChannels );
-    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y + (faces[i].height/scaleHeight)*offsetHeight,
-      faces[i].width, faces[i].height/scaleHeight));
+    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y + faces[i].height,
+      faces[i].width, faces[i].height));
     cvResize(mask, iplMask, CV_INTER_LINEAR);
     cvSub(&iplFrame, iplMask, &iplFrame);
     cvResetImageROI(&iplFrame);
   }
 
   if(i>0) {
-    int c = waitKey(10);
+    c = waitKey(10);
     if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
   }
 
@@ -168,6 +166,17 @@ void detectAndDisplay(Mat frame) {
   imshow(window_name, frame);
 }
 
+void changeStache(int argc, const char** argv) {
+  if(argc > currentStache) {
+    currentStache++;
+    stacheMaskFile = argv[currentStache];
+  } else {
+    currentStache = 1;
+    if(argc > 1) stacheMaskFile = argv[1];
+  }
+  mask = cvLoadImage(stacheMaskFile);
+  if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-2); }
+}
 
 void saveFrame(Mat frame) {
   char filename[20];
