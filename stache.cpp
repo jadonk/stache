@@ -166,7 +166,7 @@ void detectAndDisplay(Mat frame) {
   imshow(window_name, frame);
 
   //-- 0a. Attempt to resize window
-  cvResizeWindow(window_name, camWidth, camHeight);
+  //cvResizeWindow(window_name, camWidth, camHeight);
 }
 
 void changeStache(int argc, const char** argv) {
