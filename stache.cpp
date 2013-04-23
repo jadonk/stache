@@ -178,7 +178,7 @@ void changeStache(int argc, const char** argv) {
     if(argc > 1) stacheMaskFile = argv[1];
   }
   mask = cvLoadImage(stacheMaskFile);
-  fprintf(stdout, "{\"new_stache\":\"%s\"}\n", stacheMaskFile);
+  //fprintf(stdout, "{\"new_stache\":\"%s\"}\n", stacheMaskFile);
   if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-2); }
 }
 
