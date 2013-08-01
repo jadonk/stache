@@ -77,8 +77,6 @@ int currentStache = 0;
 int stacheCount = 0;
 const char **stacheFilenames;
 
-int savedFrames = 0;
-
 /**
  * @function main
  */
@@ -94,6 +92,7 @@ int main(int argc, const char** argv) {
   }
 
   //-- 0. Print the copyright
+  fprintf(stderr, "%s\n", argv[0]);
   fprintf(stderr, "%s", copyright);
 
   //-- 1. Load the cascade
@@ -163,7 +162,7 @@ void detectAndDisplay(Mat frame) {
   if(i>0) {
     c = waitKey(10);
     //c = inputAvailable();
-    if( c > 0 ) fprintf(stderr, "Got key %d.\n", c);
+    //if( c > 0 ) fprintf(stderr, "Got key %d.\n", c);
     if( c == 65361 || c == 63234 ) { saveFrame(frame); }  //-- save on press of left arrow
     if( c == 65363 || c == 63235 ) { changeStache(); }  //-- change stache on press of right arrow
   }
@@ -192,13 +191,16 @@ void changeStache() {
 
 void saveFrame(Mat frame) {
   char filename[40];
+  time_t mytime;
+  struct tm y2k;
+  y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
+  y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
   IplImage iplFrame = frame;
-  sprintf(filename, "/home/root/stache/tmp/captured%03d.jpg", savedFrames);
+  time(&mytime);
+  sprintf(filename, "tmp/captured%010ld.jpg", (long)difftime(mytime,mktime(&y2k)));
   cvSaveImage(filename, &iplFrame);
   fprintf(stdout, "{\"tweet\":\"New BeagleStache captured!\",\"filename\":\"%s\"}\n", filename);
   fflush(stdout);
-  savedFrames++;
-  if(savedFrames >= 1000) savedFrames = 0;
 }
 
 int inputAvailable()  
