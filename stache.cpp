@@ -14,7 +14,7 @@
 using namespace std;
 using namespace cv;
 
-const char copyright[] = "\
+const char *copyright = "\
  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING. \n\
  \n\
  By downloading, copying, installing or using the software you agree to this license.\n\
@@ -59,7 +59,7 @@ void detectAndDisplay(Mat frame);
 void saveFrame(Mat frame);
 int inputAvailable();
 void inputSetup(int setup);
-void changeStache(int argc, const char** argv);
+void changeStache();
 
 /** Global variables */
 String face_cascade_name = "lbpcascade_frontalface.xml";
@@ -73,7 +73,9 @@ const char* stacheMaskFile = "stache-mask.png";
 int camWidth = 0;
 int camHeight = 0;
 float camFPS = 0;
-int currentStache = 1;
+int currentStache = 0;
+int stacheCount = 0;
+const char **stacheFilenames;
 
 int savedFrames = 0;
 
@@ -85,7 +87,11 @@ int main(int argc, const char** argv) {
   Mat frame;
   int c;
 
-  if(argc > 1) stacheMaskFile = argv[1];
+  if(argc > 1) {
+    stacheMaskFile = argv[1];
+    stacheCount = argc - 2;
+    stacheFilenames = argv + 1;
+  }
 
   //-- 0. Print the copyright
   fprintf(stderr, "%s", copyright);
@@ -111,8 +117,6 @@ int main(int argc, const char** argv) {
       try {
        if(!frame.empty()) {
         detectAndDisplay( frame );
-        c = waitKey(10);
-        if( c == 65363 ) { changeStache(argc, argv); }  //-- change stache on press of right arrow
        } else {
         fprintf(stderr, " --(!) No captured frame -- Break!\n");
         break;
@@ -158,7 +162,10 @@ void detectAndDisplay(Mat frame) {
 
   if(i>0) {
     c = waitKey(10);
-    if( c == 65361 ) { saveFrame(frame); }  //-- save on press of left arrow
+    //c = inputAvailable();
+    if( c > 0 ) fprintf(stderr, "Got key %d.\n", c);
+    if( c == 65361 || c == 63234 ) { saveFrame(frame); }  //-- save on press of left arrow
+    if( c == 65363 || c == 63235 ) { changeStache(); }  //-- change stache on press of right arrow
   }
 
   //-- Show what you got
@@ -169,22 +176,22 @@ void detectAndDisplay(Mat frame) {
   //cvResizeWindow(window_name, camWidth, camHeight);
 }
 
-void changeStache(int argc, const char** argv) {
-  if(argc > currentStache + 1) {
-    currentStache++;
-    stacheMaskFile = argv[currentStache];
-  } else {
-    currentStache = 1;
-    if(argc > 1) stacheMaskFile = argv[1];
+void changeStache() {
+  while(stacheCount > 0) {
+    if(currentStache < stacheCount) {
+      currentStache++;
+    } else {
+      currentStache = 0;
+    }
+    stacheMaskFile = stacheFilenames[currentStache];
+    mask = cvLoadImage(stacheMaskFile);
+    if(mask) break;
+    fprintf(stderr, "Could not load %s\n", stacheMaskFile);
   }
-  mask = cvLoadImage(stacheMaskFile);
-  //fprintf(stdout, "{\"new_stache\":\"%s\"}\n", stacheMaskFile);
-  if(!mask) { fprintf(stderr, "Could not load %s\n", stacheMaskFile); exit(-2); }
 }
 
 void saveFrame(Mat frame) {
   char filename[40];
-  flip(frame, frame, 1); // de-mirror-image-ize
   IplImage iplFrame = frame;
   sprintf(filename, "/home/root/stache/tmp/captured%03d.jpg", savedFrames);
   cvSaveImage(filename, &iplFrame);
