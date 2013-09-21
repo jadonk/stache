@@ -1,9 +1,9 @@
-CC=g++
-CFLAGS=`pkg-config --static --libs opencv` -O3
+CC := g++
+CFLAGS := `pkg-config --static --libs opencv` -O3
 
 all: stache
 
-stache: stache.cpp
+stache: stache.cpp Makefile
 	$(CC) $(CFLAGS) -o stache stache.cpp
 
 clean:
