@@ -106,8 +106,8 @@ int main(int argc, const char** argv) {
   capture = cvCaptureFromCAM(numCamera);
   //if(camWidth) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, camWidth);
   //if(camHeight) cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, camHeight);
-  cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, 160);
-  cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, 120);
+  cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, 320);
+  cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, 240);
   //if(camFPS) cvSetCaptureProperty(capture, CV_CAP_PROP_FPS, camFPS);
   if(capture) {
     inputSetup(1);
