@@ -1,0 +1,12 @@
+[Unit]
+Description=BeagleStache
+After=gdm.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/root/stache
+ExecStart=/home/root/stache/runstache
+Restart=never
+
+[Install]
+WantedBy=multi-user.target
