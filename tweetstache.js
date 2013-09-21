@@ -12,8 +12,8 @@ try {
     config = require('./config');
 } catch(ex) {
     winston.info("Not tweeting, no keys found: " + ex);
-    config.trigger = "/sys/class/leds/lcd3\:\:usr0/trigger";
-    config.brightness = "/sys/class/leds/lcd3\:\:usr0/brightness";
+    config.trigger = "/sys/class/leds/lcd3\:green\:usr0/trigger";
+    config.brightness = "/sys/class/leds/lcd3\:green\:usr0/brightness";
     config.twitterKey = false;
     config.message = "New #BeagleBone BeagleStache image captured! @BeagleBoardOrg";
 }
