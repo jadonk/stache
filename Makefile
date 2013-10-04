@@ -1,13 +1,6 @@
-CC := g++
-CFLAGS := `pkg-config --static --libs opencv` -O3
 
-all: stache
+BOARD_TAG      = userspace
 
-stache: stache.cpp Makefile
-	$(CC) $(CFLAGS) -o stache stache.cpp
+USERSPACE_MAKE = TRUE
 
-clean:
-	rm -f stache
-
-install: stache
-	cp stache.desktop $(HOME)/Desktop/
+include ../../arduino-mk/Userspace.mk
