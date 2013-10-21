@@ -119,11 +119,9 @@ int main(int argc, const char** argv) {
        if(!frame.empty()) {
         detectAndDisplay( frame );
        } else {
-        fprintf(stderr, " --(!) No captured frame -- Break!\n");
-        break;
+        fprintf(stderr, " --(!) No captured frame!\n");
        }
-      } catch(cv::Exception e) {
-        break;
+      } catch(...) {
       }
     }
     inputSetup(0);
@@ -152,12 +150,15 @@ void detectAndDisplay(Mat frame) {
     //-- Scale and apply mustache mask for each face
     Mat faceROI = frame_gray(faces[i]);
     IplImage iplFrame = frame;
-    IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, faces[i].height),
+    int height = faces[i].height*4/3;
+    int offset = faces[i].y - faces[i].height/4;
+    if(offset < 0) offset = 0;
+    IplImage *iplMask = cvCreateImage(cvSize(faces[i].width, height),
       mask->depth, mask->nChannels );
-    cvSetImageROI(&iplFrame, cvRect(faces[i].x, faces[i].y,
-      faces[i].width, faces[i].height));
+    cvSetImageROI(&iplFrame, cvRect(faces[i].x, offset,
+      faces[i].width, height));
     cvResize(mask, iplMask, CV_INTER_LINEAR);
-    cvSub(&iplFrame, iplMask, &iplFrame);
+    cvAdd(&iplFrame, iplMask, &iplFrame);
     cvResetImageROI(&iplFrame);
   }
 
