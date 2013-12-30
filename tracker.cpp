@@ -31,7 +31,7 @@ void trackObject(IplImage* imgThresh){
         int posX = moment10/area;
         int posY = moment01/area;        
         
-        if(lastX>=0 && lastY>=0 && posX>=0 && posY>=0)
+        if(debug>1 && lastX>=0 && lastY>=0 && posX>=0 && posY>=0)
         {
             // Draw a yellow line from the previous point to the current point
             cvLine(imgTracking, cvPoint(posX, posY), cvPoint(lastX, lastY), cvScalar(0,0,255), 4);
@@ -70,7 +70,7 @@ int main(){
       halfWidth = dim.width/2;
       halfHeight = dim.height/2;
 
-      if(debug > 1) {
+      if(debug>0) {
          cvNamedWindow("Video");     
          cvNamedWindow("Ball");
       }
@@ -93,10 +93,12 @@ int main(){
             //track the possition of the ball
             trackObject(imgThresh);
 
-            // Add the tracking image and the frame
-            cvAdd(frame, imgTracking, frame);
+            if(debug>1) {
+               // Add the tracking image and the frame
+               cvAdd(frame, imgTracking, frame);
+            }
 
-            if(debug > 1) {
+            if(debug>0) {
                cvShowImage("Ball", imgThresh);           
                cvShowImage("Video", frame);
             }
