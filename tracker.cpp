@@ -6,6 +6,10 @@ IplImage* imgTracking;
 int lastX = -1;
 int lastY = -1;
 
+int debug = 0;
+int delay = 100;
+int halfWidth, halfHeight;
+
 //This function threshold the HSV image and create a binary image
 IplImage* GetThresholdedImage(IplImage* imgHSV){       
     IplImage* imgThresh=cvCreateImage(cvGetSize(imgHSV),IPL_DEPTH_8U, 1);
@@ -35,6 +39,10 @@ void trackObject(IplImage* imgThresh){
 
         lastX = posX;
         lastY = posY;
+
+        printf("%+05d %+05d\n", posX-halfWidth, posY-halfHeight);
+    }else{
+        printf("***** *****\n");
     }
 
     free(moments); 
@@ -42,7 +50,8 @@ void trackObject(IplImage* imgThresh){
 
 
 int main(){
-      CvCapture* capture =0;       
+      CvCapture* capture =0;
+      CvSize dim;
       capture = cvCaptureFromCAM(0);
       if(!capture){
          printf("Capture failure\n");
@@ -54,11 +63,17 @@ int main(){
       if(!frame) return -1;
    
       //create a blank image and assigned to 'imgTracking' which has the same size of original video
-      imgTracking=cvCreateImage(cvGetSize(frame),IPL_DEPTH_8U, 3);
+      dim = cvGetSize(frame);
+      imgTracking=cvCreateImage(dim,IPL_DEPTH_8U, 3);
       cvZero(imgTracking); //covert the image, 'imgTracking' to black
 
-      cvNamedWindow("Video");     
-      cvNamedWindow("Ball");
+      halfWidth = dim.width/2;
+      halfHeight = dim.height/2;
+
+      if(debug > 1) {
+         cvNamedWindow("Video");     
+         cvNamedWindow("Ball");
+      }
 
       //iterate through each frames of the video     
       while(true){
@@ -81,16 +96,18 @@ int main(){
             // Add the tracking image and the frame
             cvAdd(frame, imgTracking, frame);
 
-            cvShowImage("Ball", imgThresh);           
-            cvShowImage("Video", frame);
+            if(debug > 1) {
+               cvShowImage("Ball", imgThresh);           
+               cvShowImage("Video", frame);
+            }
            
             //Clean up used images
             cvReleaseImage(&imgHSV);
             cvReleaseImage(&imgThresh);            
             cvReleaseImage(&frame);
 
-            //Wait 10mS
-            int c = cvWaitKey(10);
+            //Wait X mS
+            int c = cvWaitKey(delay);
             //If 'ESC' is pressed, break the loop
             if((char)c==27 ) break;      
       }
