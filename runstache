@@ -1,5 +1,6 @@
 #!/bin/sh
 cd $HOME/stache
-export XAUTHORITY=`ls /var/run/gdm/auth-for-root-*/database`
+#export XAUTHORITY=`ls /var/run/gdm/auth-for-root-*/database`
+export XAUTHORITY=/home/debian/.Xauthority
 export DISPLAY=:0.0
 node tweetstache.js
