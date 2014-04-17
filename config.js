@@ -1,8 +1,7 @@
-exports.twitterKey = "Consumer key";
-exports.twitterSecret = "Consumer secret";
-exports.accessToken = "Access token";
-exports.tokenSecret = "Access token secret";
-exports.brightness = "/sys/class/leds/beaglebone\:green\:usr3/brightness";
+exports.twitterKey = "";
+exports.twitterSecret = "";
+exports.accessToken = "";
+exports.tokenSecret = "";
 exports.trigger = "/sys/class/leds/beaglebone\:green\:usr3/trigger";
-exports.message="New #BeagleBoneBlack @BeagleStache image captured!"
-
+exports.brightness = "/sys/class/leds/beaglebone\:green\:usr3/brightness";
+exports.message = "At #makerfaire? Give @jadon your card for the chance to win @beagleboardorg #beagleboneblack or #badtothebone!";
