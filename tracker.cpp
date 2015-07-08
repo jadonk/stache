@@ -11,9 +11,24 @@ int delay = 100;
 int halfWidth, halfHeight;
 
 //This function threshold the HSV image and create a binary image
-IplImage* GetThresholdedImage(IplImage* imgHSV){       
+IplImage* GetThresholdedImage(IplImage* imgHSV){
+    static int gotHSV = 0;
+    static int Hmin, Hmax, Smin, Smax, Vmin, Vmax;
+    FILE *fp;
+    if(!gotHSV || debug > 1) {
+        gotHSV = 1;
+        fp = fopen("hsv.txt","r");
+        fscanf(fp, "%d", &Hmin);
+        fscanf(fp, "%d", &Hmax);
+        fscanf(fp, "%d", &Smin);
+        fscanf(fp, "%d", &Smax);
+        fscanf(fp, "%d", &Vmin);
+        fscanf(fp, "%d", &Vmax);
+        printf("hsv.txt: %d-%d, %d-%d, %d-%d\n", Hmin, Hmax, Smin, Smax, Vmin, Vmax);
+        fclose(fp);
+    }
     IplImage* imgThresh=cvCreateImage(cvGetSize(imgHSV),IPL_DEPTH_8U, 1);
-    cvInRangeS(imgHSV, cvScalar(170,160,60), cvScalar(180,2556,256), imgThresh); 
+    cvInRangeS(imgHSV, cvScalar(Hmin,Smin,Vmin), cvScalar(Hmax,Smax,Vmax), imgThresh); 
     return imgThresh;
 }
 
@@ -25,8 +40,8 @@ void trackObject(IplImage* imgThresh){
     double moment01 = cvGetSpatialMoment(moments, 0, 1);
     double area = cvGetCentralMoment(moments, 0, 0);
 
-    // if the area<1000, I consider that the there are no object in the image and it's because of the noise, the area is not zero 
-    if(area>1000){
+    // if the area<100, I consider that the there are no object in the image and it's because of the noise, the area is not zero 
+    if(area>100){
         // calculate the position of the ball
         int posX = moment10/area;
         int posY = moment01/area;        
@@ -52,7 +67,17 @@ void trackObject(IplImage* imgThresh){
 int main(){
       CvCapture* capture =0;
       CvSize dim;
+
+      FILE *fp;
+      fp = fopen("debug.txt","r");
+      if(fp) {
+          fscanf(fp, "%d", &debug);
+          fclose(fp);
+      }
+
       capture = cvCaptureFromCAM(0);
+      cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, 160);
+      cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, 120);
       if(!capture){
          printf("Capture failure\n");
          return -1;
