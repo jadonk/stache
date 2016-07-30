@@ -11,6 +11,13 @@
 #include <termios.h>
 #include <unistd.h>
 
+#ifndef DISABLE_MOUSE
+#include <stdio.h>
+#include <stdlib.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#endif
+
 using namespace std;
 using namespace cv;
 
@@ -62,14 +69,18 @@ void inputSetup(int setup);
 void changeStache();
 
 /** Global variables */
-String face_cascade_name = "lbpcascade_frontalface.xml";
+String face_cascade_name = "/usr/local/share/beaglestache/lbpcascade_frontalface.xml";
 CascadeClassifier face_cascade;
-const char * window_name = "stache - BeagleBone OpenCV demo";
+const char * window_name = "beaglestache - BeagleBone OpenCV demo";
 IplImage* mask = 0;
+#ifndef DISABLE_MOUSE
+Display *display;
+Window window;
+#endif
 
 /** Command-line arguments */
 int numCamera = -1;
-const char* stacheMaskFile = "stache-mask.png";
+const char* stacheMaskFile = "/usr/local/share/beaglestache/stache-mask.png";
 int camWidth = 0;
 int camHeight = 0;
 float camFPS = 0;
@@ -139,6 +150,9 @@ void detectAndDisplay(Mat frame) {
   Mat frame_gray;
   int i = 0;
   int c;
+#ifndef DISABLE_MOUSE
+  XEvent event;
+#endif
 
   cvtColor(frame, frame_gray, CV_BGR2GRAY);
   equalizeHist(frame_gray, frame_gray);
@@ -168,6 +182,16 @@ void detectAndDisplay(Mat frame) {
     //if( c > 0 ) fprintf(stderr, "Got key %d.\n", c);
     if( c == 65361 || c == 63234 ) { saveFrame(frame); }  //-- save on press of left arrow
     if( c == 65363 || c == 63235 ) { changeStache(); }  //-- change stache on press of right arrow
+#ifndef DISABLE_MOUSE
+    if(XCheckMaskEvent(display, ButtonReleaseMask, &event)) {
+    //if(XNextEvent(display, &event)) {
+      fprintf(stderr, "Got event.\n");
+      if( event.type == ButtonRelease ) {
+        if( event.xbutton.button == Button1 ) { saveFrame(frame); }  // save on left click
+        if( event.xbutton.button == Button3 ) { changeStache(); }  // save on right click
+      }
+    }
+#endif
   }
 
   //-- Show what you got
@@ -200,7 +224,7 @@ void saveFrame(Mat frame) {
   y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
   IplImage iplFrame = frame;
   time(&mytime);
-  sprintf(filename, "tmp/captured%010ld.jpg", (long)difftime(mytime,mktime(&y2k)));
+  sprintf(filename, "/var/tmp/beaglestache/captured%010ld.jpg", (long)difftime(mytime,mktime(&y2k)));
   cvSaveImage(filename, &iplFrame);
   fprintf(stdout, "{\"tweet\":\"New BeagleStache captured!\",\"filename\":\"%s\"}\n", filename);
   fflush(stdout);
@@ -235,4 +259,16 @@ void inputSetup(int setup)
   } else {
    tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
   }
+#ifndef DISABLE_MOUSE
+  if(setup) {
+    display = XOpenDisplay(NULL);
+    if( !display ){ fprintf(stderr, "--(!)Error opening X display\n"); exit(-1); };
+    window = XDefaultRootWindow(display);
+    XGrabPointer(display, window, False, ButtonReleaseMask, GrabModeAsync,
+      GrabModeAsync, None, None, CurrentTime);
+    XSelectInput(display, window, ButtonReleaseMask) ;
+  } else {
+    XCloseDisplay(display);
+  }
+#endif
 }
