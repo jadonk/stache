@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Use BeagleBone beaglestache app to put mustaches on people's faces and send them to Twitter",
   "main": "tweetstache.js",
+  "files": [ "tweetstache.js" ],
   "dependencies": {
     "node-twitter-api": "^1.7.2",
     "oauth": "^0.9.14",
