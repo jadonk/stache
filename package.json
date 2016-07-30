@@ -1,0 +1,32 @@
+{
+  "name": "tweetstache",
+  "version": "0.0.2",
+  "description": "Use BeagleBone beaglestache app to put mustaches on people's faces and send them to Twitter",
+  "main": "tweetstache.js",
+  "dependencies": {
+    "node-twitter-api": "^1.7.2",
+    "oauth": "^0.9.14",
+    "winston": "^0.6.2",
+    "request": "^2.72.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jadonk/stache"
+  },
+  "keywords": [
+    "mustache",
+    "beaglebone",
+    "twitter",
+    "opencv",
+    "facerecognition"
+  ],
+  "author": "Jason Kridner",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/jadonk/stache/issues"
+  }
+}
