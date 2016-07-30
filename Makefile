@@ -36,11 +36,11 @@ install:
 	install -m 644 beaglestache.desktop $(DESTDIR)/etc/xdg/autostart/
 	install -m 755 -d $(DESTDIR)$(PREFIX)/share/beaglestache
 	install -m 644 lbpcascade_frontalface.xml $(DESTDIR)$(PREFIX)/share/beaglestache/
+	install -m 644 stache-mask.png $(DESTDIR)$(PREFIX)/share/beaglestache/
 	install -m 755 -d $(DESTDIR)$(PREFIX)/share/beaglestache/staches
 	install -m 644 stache-2.png $(DESTDIR)$(PREFIX)/share/beaglestache/staches/
 	install -m 644 stache-3.png $(DESTDIR)$(PREFIX)/share/beaglestache/staches/
 	install -m 644 stache-4.png $(DESTDIR)$(PREFIX)/share/beaglestache/staches/
-	install -m 644 stache-mask.png $(DESTDIR)$(PREFIX)/share/beaglestache/staches/
 	install -m 644 stache-robclark.png $(DESTDIR)$(PREFIX)/share/beaglestache/staches/
 	install -m 755 -d $(DESTDIR)/etc/beaglestache
 	install -m 644 config.js $(DESTDIR)/etc/beaglestache/
