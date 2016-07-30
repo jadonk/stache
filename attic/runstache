@@ -1,6 +1,7 @@
 #!/bin/sh
-cd $HOME/stache
+cd /usr/local/lib/node_modules/beaglestache
 #export XAUTHORITY=`ls /var/run/gdm/auth-for-root-*/database`
 export XAUTHORITY=/home/debian/.Xauthority
 export DISPLAY=:0.0
+killall -q adcjs
 node tweetstache.js
